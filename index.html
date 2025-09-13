@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to PDF Converter</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f9f9f9; }
+        .container { max-width: 700px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 200px; margin-bottom: 20px; font-family: monospace; font-size: 1em; }
+        button { padding: 10px 20px; font-size: 1em; border: none; border-radius: 4px; background: #007bff; color: #fff; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #preview { border: 1px solid #ddd; padding: 15px; margin-top: 20px; background: #fafafa; min-height: 100px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>HTML to PDF Converter</h2>
+        <textarea id="htmlInput" placeholder="Paste your HTML here..."></textarea>
+        <br>
+        <button onclick="generatePDF()">Download PDF</button>
+        <h3>Preview:</h3>
+        <div id="preview"></div>
+    </div>
+    <!-- jsPDF and html2canvas from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const htmlInput = document.getElementById('htmlInput');
+        const preview = document.getElementById('preview');
+        htmlInput.addEventListener('input', () => {
+            preview.innerHTML = htmlInput.value;
+        });
+        function generatePDF() {
+            preview.innerHTML = htmlInput.value;
+            html2canvas(preview).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new window.jspdf.jsPDF();
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+                pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                pdf.save('document.pdf');
+            });
+        }
+    </script>
+</body>
+</html>
